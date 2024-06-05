@@ -15,7 +15,7 @@ import {
   getDocs,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-import { setupPosts } from "./index.js";
+import { setupPosts, setupUI } from "./index.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -41,9 +41,11 @@ onAuthStateChanged(auth, (user) => {
     //GET DATA FROM FIRESTORE
     getDocs(colRef).then((snapshot) => {
       setupPosts(snapshot.docs);
+      setupUI(user);
     });
   } else {
     setupPosts([]);
+    setupUI();
   }
 });
 
