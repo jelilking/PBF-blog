@@ -1,6 +1,11 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
 import {
   getFirestore,
   collection,
@@ -31,5 +36,15 @@ const signupForm = document.querySelector("#signup-form");
 signupForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  //get user infor
+  //get user info
+  const email = signupForm["signup-email"].value;
+  const password = signupForm["signup-password"].value;
+
+  //signup the user
+  createUserWithEmailAndPassword(auth, email, password).then((cred) => {
+    console.log(cred);
+    const modal = document.querySelector("#modal-signup");
+    M.Modal.getInstance(modal).close();
+    signupForm.reset();
+  });
 });
