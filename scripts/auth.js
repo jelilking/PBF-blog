@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   signInWithEmailAndPassword,
+  onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
@@ -33,6 +34,15 @@ const db = getFirestore();
 const colRef = collection(db, "posts");
 const auth = getAuth();
 
+//LISTEN FOR AUTH STATE CHANGES
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("user logged in: ", user);
+  } else {
+    console.log("user logged out: ");
+  }
+});
+
 //SIGNUP
 const signupForm = document.querySelector("#signup-form");
 signupForm.addEventListener("submit", (e) => {
@@ -55,9 +65,7 @@ signupForm.addEventListener("submit", (e) => {
 const logout = document.querySelector("#logout");
 logout.addEventListener("click", (e) => {
   e.preventDefault();
-  signOut(auth).then(() => {
-    console.log("the user has signed out ");
-  });
+  signOut(auth);
 });
 
 //LOGIN
@@ -71,7 +79,6 @@ loginForm.addEventListener("submit", (e) => {
 
   //login the user
   signInWithEmailAndPassword(auth, email, password).then((cred) => {
-    console.log(cred.user);
     //close the login modal and reset the form
     const modal = document.querySelector("#modal-login");
     M.Modal.getInstance(modal).close();
