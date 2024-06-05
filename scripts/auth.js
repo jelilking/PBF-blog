@@ -35,17 +35,15 @@ const db = getFirestore();
 const colRef = collection(db, "posts");
 const auth = getAuth();
 
-//GET DATA FROM FIRESTORE
-getDocs(colRef).then((snapshot) => {
-  setupPosts(snapshot.docs);
-});
-
 //LISTEN FOR AUTH STATE CHANGES
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    console.log("user logged in: ", user);
+    //GET DATA FROM FIRESTORE
+    getDocs(colRef).then((snapshot) => {
+      setupPosts(snapshot.docs);
+    });
   } else {
-    console.log("user logged out: ");
+    setupPosts([]);
   }
 });
 
