@@ -4,6 +4,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import {
   getAuth,
   createUserWithEmailAndPassword,
+  signOut,
+  signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
@@ -42,9 +44,37 @@ signupForm.addEventListener("submit", (e) => {
 
   //signup the user
   createUserWithEmailAndPassword(auth, email, password).then((cred) => {
-    console.log(cred);
+    //close the signup modal and reset the form
     const modal = document.querySelector("#modal-signup");
     M.Modal.getInstance(modal).close();
     signupForm.reset();
+  });
+});
+
+//LOGOUT
+const logout = document.querySelector("#logout");
+logout.addEventListener("click", (e) => {
+  e.preventDefault();
+  signOut(auth).then(() => {
+    console.log("the user has signed out ");
+  });
+});
+
+//LOGIN
+const loginForm = document.querySelector("#login-form");
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  //get the user infor
+  const email = loginForm["login-email"].value;
+  const password = loginForm["login-password"].value;
+
+  //login the user
+  signInWithEmailAndPassword(auth, email, password).then((cred) => {
+    console.log(cred.user);
+    //close the login modal and reset the form
+    const modal = document.querySelector("#modal-login");
+    M.Modal.getInstance(modal).close();
+    loginForm.reset();
   });
 });
