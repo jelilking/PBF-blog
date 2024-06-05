@@ -1,3 +1,34 @@
+//SETING UP THE POSTS
+const postList = document.querySelector(".post-grid");
+
+//setup posts
+export const setupPosts = (data) => {
+  let html = "";
+
+  data.forEach((doc) => {
+    const post = doc.data();
+    console.log(post);
+    const div = ` 
+    <div class="post-card card">
+                <div class="card-content">
+                    <span class="card-title" style="font-weight: 700;">
+                    ${post.title}
+                    </span>
+                </div>
+                <div class="card-image">
+                    <!-- <img src="image-url-3.jpg" alt="Post Image"> -->
+                </div>
+                <div class="card-content">
+                    <p>${post.content}</p>
+                </div>
+            </div>
+            `;
+    html += div;
+  });
+
+  postList.innerHTML = html;
+};
+
 //Set Up Materialize Components
 document.addEventListener("DOMContentLoaded", function () {
   var modals = document.querySelectorAll(".modal");

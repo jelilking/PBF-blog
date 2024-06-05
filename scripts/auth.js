@@ -12,9 +12,10 @@ import {
 import {
   getFirestore,
   collection,
+  getDocs,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+
+import { setupPosts } from "./index.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -33,6 +34,11 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore();
 const colRef = collection(db, "posts");
 const auth = getAuth();
+
+//GET DATA FROM FIRESTORE
+getDocs(colRef).then((snapshot) => {
+  setupPosts(snapshot.docs);
+});
 
 //LISTEN FOR AUTH STATE CHANGES
 onAuthStateChanged(auth, (user) => {
