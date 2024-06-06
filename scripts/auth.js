@@ -22,6 +22,7 @@ import {
   getDocs,
   addDoc,
   serverTimestamp,
+  onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import { setupPosts, setupUI } from "./index.js";
@@ -44,14 +45,26 @@ const db = getFirestore();
 const colRef = collection(db, "posts");
 const auth = getAuth();
 
+//GET DATA FROM FIRESTORE
+// getDocs(colRef).then((snapshot) => {
+//   setupPosts(snapshot.docs);
+//   setupUI(user);
+// });
+
 //LISTEN FOR AUTH STATE CHANGES
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    //GET DATA FROM FIRESTORE
-    getDocs(colRef).then((snapshot) => {
-      setupPosts(snapshot.docs);
-      setupUI(user);
-    });
+    //Realtime listener
+    onSnapshot(
+      colRef,
+      (snapshot) => {
+        setupPosts(snapshot.docs);
+        setupUI(user);
+      },
+      (err) => {
+        console.log(err.message);
+      }
+    );
   } else {
     setupPosts([]);
     setupUI();
@@ -63,8 +76,8 @@ const createForm = document.querySelector("#create-form");
 createForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const file = document.querySelector("#post_image").files[0];
-  const minSize = 20 * 1024; // 20 KB in bytes
-  const maxSize = 25 * 1024; // 25 KB in bytes
+  const minSize = 17 * 1024; // 20 KB in bytes
+  const maxSize = 36 * 1024; // 25 KB in bytes
   if (file) {
     if (file.size >= minSize && file.size <= maxSize) {
       const storage = getStorage();

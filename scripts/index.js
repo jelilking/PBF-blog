@@ -4,7 +4,7 @@ const loggedInLinks = document.querySelectorAll(".logged-in");
 
 export const setupUI = (user) => {
   if (user) {
-    //toggle UI elements
+    // Toggle UI elements
     loggedInLinks.forEach((item) => {
       item.style.display = "block";
     });
@@ -12,7 +12,7 @@ export const setupUI = (user) => {
       item.style.display = "none";
     });
   } else {
-    //toggle UI elements
+    // Toggle UI elements
     loggedInLinks.forEach((item) => {
       item.style.display = "none";
     });
@@ -22,8 +22,7 @@ export const setupUI = (user) => {
   }
 };
 
-//SETING UP THE POSTS
-//setup posts
+// SETTING UP THE POSTS
 export const setupPosts = (data) => {
   if (data.length) {
     let html = "";
@@ -31,6 +30,12 @@ export const setupPosts = (data) => {
     data.forEach((doc) => {
       const post = doc.data();
       console.log(post);
+
+      const isLongContent = post.content.length > 20;
+      const displayContent = isLongContent
+        ? post.content.substring(0, 20) + "..."
+        : post.content;
+
       const div = ` 
           <div class="post-card card">
                 <div class="card-content">
@@ -42,7 +47,13 @@ export const setupPosts = (data) => {
                     <img src="${post.imageURL}" alt="Post Image">
                 </div>
                 <div class="card-content">
-                    <p>${post.content}</p>
+                    <p class="post-content">${displayContent}</p>
+                    ${
+                      isLongContent
+                        ? '<button class="show-more">Show More</button>'
+                        : ""
+                    }
+                    <p class="full-content hidden">${post.content}</p>
                 </div>
             </div>
             `;
@@ -51,11 +62,21 @@ export const setupPosts = (data) => {
 
     postList.innerHTML = html;
 
-    const postCards = document.querySelectorAll(".post-card");
-    postCards.forEach((card) => {
-      card.addEventListener("click", () => {
-        postCards.forEach((c) => c.classList.add("hidden"));
-        card.classList.remove("hidden");
+    const showMoreButtons = document.querySelectorAll(".show-more");
+    showMoreButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const cardContent = e.target.closest(".card-content");
+        const postContent = cardContent.querySelector(".post-content");
+        const fullContent = cardContent.querySelector(".full-content");
+
+        postContent.classList.toggle("hidden");
+        fullContent.classList.toggle("hidden");
+
+        if (fullContent.classList.contains("hidden")) {
+          button.textContent = "Show More";
+        } else {
+          button.textContent = "Show Less";
+        }
       });
     });
   } else {
@@ -66,13 +87,12 @@ export const setupPosts = (data) => {
                     Login to view posts
                     </span>
                 </div>
-                
             </div>
             `;
   }
 };
 
-//Set Up Materialize Components
+// Set Up Materialize Components
 document.addEventListener("DOMContentLoaded", function () {
   var modals = document.querySelectorAll(".modal");
   M.Modal.init(modals);
