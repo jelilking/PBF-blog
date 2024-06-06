@@ -22,7 +22,7 @@ export const createAdmin = (user) => {
   console.log(admin);
   if (
     user.email === "ozigi@gmail.com" ||
-    user.email === "Malikraid8@gmail.com"
+    user.email === "malikraid8@gmail.com"
   ) {
     admin.forEach((item) => {
       item.style.display = "block";

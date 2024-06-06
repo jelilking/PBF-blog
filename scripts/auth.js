@@ -74,6 +74,7 @@ onAuthStateChanged(auth, (user) => {
   } else {
     setupPosts([]);
     setupUI();
+    createAdmin();
   }
 });
 
@@ -130,10 +131,9 @@ createForm.addEventListener("submit", (e) => {
         // Reset the form after successful post creation
         createForm.reset();
       })
-      .catch((error) => {
-        console.error("Error adding document: ", error.message);
-      });
-  }
+      .catch((err) => {
+      createForm.querySelector(".error").innerHTML = err.message;
+    });
 });
 
 //SIGNUP
@@ -158,6 +158,9 @@ signupForm.addEventListener("submit", (e) => {
       const modal = document.querySelector("#modal-signup");
       M.Modal.getInstance(modal).close();
       signupForm.reset();
+    })
+    .catch((err) => {
+      signupForm.querySelector(".error").innerHTML = err.message;
     });
 });
 
@@ -178,10 +181,14 @@ loginForm.addEventListener("submit", (e) => {
   const password = loginForm["login-password"].value;
 
   //login the user
-  signInWithEmailAndPassword(auth, email, password).then((cred) => {
-    //close the login modal and reset the form
-    const modal = document.querySelector("#modal-login");
-    M.Modal.getInstance(modal).close();
-    loginForm.reset();
-  });
+  signInWithEmailAndPassword(auth, email, password)
+    .then((cred) => {
+      //close the login modal and reset the form
+      const modal = document.querySelector("#modal-login");
+      M.Modal.getInstance(modal).close();
+      loginForm.reset();
+    })
+    .catch((err) => {
+      loginForm.querySelector(".error").innerHTML = err.message;
+    });
 });
