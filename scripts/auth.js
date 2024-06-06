@@ -2,6 +2,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+import {
   getAuth,
   createUserWithEmailAndPassword,
   signOut,
@@ -13,6 +20,8 @@ import {
   getFirestore,
   collection,
   getDocs,
+  addDoc,
+  serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import { setupPosts, setupUI } from "./index.js";
@@ -46,6 +55,65 @@ onAuthStateChanged(auth, (user) => {
   } else {
     setupPosts([]);
     setupUI();
+  }
+});
+
+// CREATE NEW POST
+const createForm = document.querySelector("#create-form");
+createForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const file = document.querySelector("#post_image").files[0];
+  const minSize = 20 * 1024; // 20 KB in bytes
+  const maxSize = 25 * 1024; // 25 KB in bytes
+  if (file) {
+    if (file.size >= minSize && file.size <= maxSize) {
+      const storage = getStorage();
+      const storageRef = ref(storage, "images/" + file.name);
+
+      uploadBytes(storageRef, file)
+        .then((snapshot) => {
+          getDownloadURL(snapshot.ref)
+            .then((url) => {
+              // Add the post to Firestore with the image URL
+              addDoc(colRef, {
+                title: createForm["title"].value,
+                content: createForm["content"].value,
+                imageURL: url, // Add the image URL to the post data
+                createdAt: serverTimestamp(),
+              })
+                .then(() => {
+                  // Reset the form after successful upload and post creation
+                  createForm.reset();
+                })
+                .catch((error) => {
+                  console.error("Error adding document: ", error.message);
+                });
+            })
+            .catch((error) => {
+              console.error("Error getting download URL: ", error.message);
+            });
+        })
+        .catch((error) => {
+          console.error("Error uploading file: ", error.message);
+        });
+    } else {
+      alert("File size must be between 20 KB and 25 KB.");
+    }
+  } else {
+    // Add the post to Firestore without an image URL
+    addDoc(colRef, {
+      title: createForm["title"].value,
+      content: createForm["content"].value,
+      imageURL: "",
+      createdAt: serverTimestamp(),
+    })
+      .then(() => {
+        // Reset the form after successful post creation
+        createForm.reset();
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error.message);
+      });
   }
 });
 

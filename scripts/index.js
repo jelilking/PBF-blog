@@ -39,7 +39,7 @@ export const setupPosts = (data) => {
                     </span>
                 </div>
                 <div class="card-image">
-                    <!-- <img src="image-url-3.jpg" alt="Post Image"> -->
+                    <img src="${post.imageURL}" alt="Post Image">
                 </div>
                 <div class="card-content">
                     <p>${post.content}</p>

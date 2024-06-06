@@ -26,7 +26,7 @@
         footer {
             width: 100%;
             position: fixed;
-            bottom: 0;
+            bottom: 0%;
         }
 
         @media (max-width: 992px) {
@@ -179,13 +179,13 @@
     <div id="modal-create" class="modal">
         <div class="modal-content">
             <h4>Create a New Post</h4>
-            <form id="postForm">
+            <form id="create-form">
                 <div class="input-field">
-                    <input id="post_title" type="text" class="validate" required>
+                    <input id="title" type="text" class="validate" required>
                     <label for="post_title">Title</label>
                 </div>
                 <div class="input-field">
-                    <textarea id="post_content" class="materialize-textarea" required></textarea>
+                    <textarea id="content" class="materialize-textarea" required></textarea>
                     <label for="post_content">Content</label>
                 </div>
                 <div class="file-field input-field">
@@ -214,15 +214,7 @@
     </div>
 
 
-    <!-- FOOTER -->
-    <footer class="page-footer grey lighten-3">
 
-        <div class="footer-copyright">
-            <div class="container black-text">
-                © 2024 BlogPost(PFB). All rights reserved. coded by jelilking
-            </div>
-        </div>
-    </footer>
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
