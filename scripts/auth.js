@@ -23,9 +23,11 @@ import {
   addDoc,
   serverTimestamp,
   onSnapshot,
+  doc,
+  setDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-import { setupPosts, setupUI } from "./index.js";
+import { setupPosts, setupUI, createAdmin } from "./index.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -45,6 +47,8 @@ const db = getFirestore();
 const colRef = collection(db, "posts");
 const auth = getAuth();
 
+export const colUserRef = collection(db, "users");
+
 //GET DATA FROM FIRESTORE
 // getDocs(colRef).then((snapshot) => {
 //   setupPosts(snapshot.docs);
@@ -54,12 +58,14 @@ const auth = getAuth();
 //LISTEN FOR AUTH STATE CHANGES
 onAuthStateChanged(auth, (user) => {
   if (user) {
+    console.log(user);
     //Realtime listener
     onSnapshot(
       colRef,
       (snapshot) => {
         setupPosts(snapshot.docs);
         setupUI(user);
+        createAdmin(user);
       },
       (err) => {
         console.log(err.message);
@@ -76,10 +82,10 @@ const createForm = document.querySelector("#create-form");
 createForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const file = document.querySelector("#post_image").files[0];
-  const minSize = 17 * 1024; // 20 KB in bytes
-  const maxSize = 36 * 1024; // 25 KB in bytes
+
+  const maxSize = 36 * 1024; // 36 KB in bytes
   if (file) {
-    if (file.size >= minSize && file.size <= maxSize) {
+    if (file.size <= maxSize) {
       const storage = getStorage();
       const storageRef = ref(storage, "images/" + file.name);
 
@@ -140,12 +146,19 @@ signupForm.addEventListener("submit", (e) => {
   const password = signupForm["signup-password"].value;
 
   //signup the user
-  createUserWithEmailAndPassword(auth, email, password).then((cred) => {
-    //close the signup modal and reset the form
-    const modal = document.querySelector("#modal-signup");
-    M.Modal.getInstance(modal).close();
-    signupForm.reset();
-  });
+  createUserWithEmailAndPassword(auth, email, password)
+    .then((cred) => {
+      const setDocRef = doc(colUserRef, cred.user.uid);
+      setDoc(setDocRef, {
+        bio: signupForm["signup-bio"].value,
+      });
+    })
+    .then(() => {
+      //close the signup modal and reset the form
+      const modal = document.querySelector("#modal-signup");
+      M.Modal.getInstance(modal).close();
+      signupForm.reset();
+    });
 });
 
 //LOGOUT

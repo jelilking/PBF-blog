@@ -1,9 +1,52 @@
+import {
+  doc,
+  getDoc,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import { colUserRef } from "./auth.js";
+
 const postList = document.querySelector(".post-grid");
 const loggedOutLinks = document.querySelectorAll(".logged-out");
 const loggedInLinks = document.querySelectorAll(".logged-in");
+const accoutDetails = document.querySelector(".account-details");
+
+const adminForm = document.querySelector(".admin-actions");
+adminForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const adminEmail = document.querySelector("#admin-email").value;
+});
+
+//ADD ADMIN FUNCTIONS
+export const createAdmin = (user) => {
+  const admin = document.querySelectorAll(".admin");
+  console.log(admin);
+  if (
+    user.email === "ozigi@gmail.com" ||
+    user.email === "Malikraid8@gmail.com"
+  ) {
+    admin.forEach((item) => {
+      item.style.display = "block";
+    });
+  } else {
+    admin.forEach((item) => {
+      item.style.display = "none";
+    });
+  }
+};
 
 export const setupUI = (user) => {
   if (user) {
+    //account info
+    const getdoc = doc(colUserRef, user.uid);
+    getDoc(getdoc).then((doc) => {
+      const html = `
+    <div>Logged in as ${user.email}</div>
+    <div>${doc.data().bio}</div>
+    `;
+
+      accoutDetails.innerHTML = html;
+    });
+
     // Toggle UI elements
     loggedInLinks.forEach((item) => {
       item.style.display = "block";
@@ -12,6 +55,9 @@ export const setupUI = (user) => {
       item.style.display = "none";
     });
   } else {
+    //hide account info
+    accoutDetails.innerHTML = "";
+
     // Toggle UI elements
     loggedInLinks.forEach((item) => {
       item.style.display = "none";
@@ -33,7 +79,7 @@ export const setupPosts = (data) => {
 
       const isLongContent = post.content.length > 20;
       const displayContent = isLongContent
-        ? post.content.substring(0, 20) + "..."
+        ? post.content.substring(0, 50) + "..."
         : post.content;
 
       const div = ` 

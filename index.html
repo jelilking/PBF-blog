@@ -23,11 +23,7 @@
         }
 
 
-        footer {
-            width: 100%;
-            position: fixed;
-            bottom: 0%;
-        }
+
 
         @media (max-width: 992px) {
             .post-card {
@@ -41,29 +37,7 @@
             }
         }
 
-        .font-weight-100 {
-            font-weight: 100;
-        }
 
-        .font-weight-200 {
-            font-weight: 200;
-        }
-
-        .font-weight-300 {
-            font-weight: 300;
-        }
-
-        .font-weight-400 {
-            font-weight: 400;
-        }
-
-        .font-weight-500 {
-            font-weight: 500;
-        }
-
-        .font-weight-600 {
-            font-weight: 600;
-        }
 
         .font-weight-700 {
             font-weight: 700;
@@ -95,7 +69,7 @@
                 <li class="logged-in" style="display: none">
                     <a href="#" class="white-text" id="logout">Logout</a>
                 </li>
-                <li class="logged-in" style="display: none">
+                <li class="admin" style="display: none">
                     <a href="#" class="white-text modal-trigger" data-target="modal-create">Create Post</a>
                 </li>
                 <li class="logged-out" style="display: none">
@@ -116,7 +90,7 @@
         <li class="logged-in" style="display: none">
             <a href="#" class="grey-text" id="logout">Logout</a>
         </li>
-        <li class="logged-in" style="display: none">
+        <li class="admin" style="display: none">
             <a href="#" class="grey-text modal-trigger" data-target="modal-create">Create Post</a>
         </li>
         <li class="logged-out" style="display: none">
@@ -126,6 +100,12 @@
             <a href="#" class="grey-text modal-trigger" data-target="modal-signup">Sign Up</a>
         </li>
     </ul>
+
+    <!-- ADMIN ACTIONS -->
+    <form class="center-align admin-actions admin" style="margin: 40px auto; max-width: 300px; display: none;">
+        <input type="email" placeholder="User email" id="admin-email" required>
+        <button class="btn-small yellow darken-2 z-depth-1">Make Admin</button>
+    </form>
 
     <!-- SIGNUP -->
     <div id="modal-signup" class="modal">
@@ -142,7 +122,7 @@
                 </div>
                 <div class="input-field">
                     <input type="text" id="signup-bio" required>
-                    <label for="signup-bio">one line bio</label>
+                    <label for="signup-bio">One line bio</label>
                 </div>
                 <button class="btn yellow darken-2 z-depth-1">Sign Up</button>
             </form>
