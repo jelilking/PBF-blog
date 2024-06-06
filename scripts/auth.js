@@ -132,8 +132,9 @@ createForm.addEventListener("submit", (e) => {
         createForm.reset();
       })
       .catch((err) => {
-      createForm.querySelector(".error").innerHTML = err.message;
-    });
+        signupForm.querySelector(".error").innerHTML = err.message;
+      });
+  }
 });
 
 //SIGNUP
