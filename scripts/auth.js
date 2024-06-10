@@ -1,13 +1,10 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
 import {
   getStorage,
   ref,
   uploadBytes,
   getDownloadURL,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -15,7 +12,6 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
 import {
   getFirestore,
   collection,
@@ -29,7 +25,6 @@ import {
 
 import { setupPosts, setupUI, createAdmin } from "./index.js";
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDde5REr6DSGvvn53h0exMKUDWuHeC5sPY",
   authDomain: "peak-body-fitness.firebaseapp.com",
@@ -39,27 +34,16 @@ const firebaseConfig = {
   appId: "1:1074385600003:web:44e02cfff0ca347836d836",
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-//Get Firestore Database and Authentication
 const db = getFirestore();
 const colRef = collection(db, "posts");
 const auth = getAuth();
 
 export const colUserRef = collection(db, "users");
 
-//GET DATA FROM FIRESTORE
-// getDocs(colRef).then((snapshot) => {
-//   setupPosts(snapshot.docs);
-//   setupUI(user);
-// });
-
-//LISTEN FOR AUTH STATE CHANGES
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    console.log(user);
-    //Realtime listener
     onSnapshot(
       colRef,
       (snapshot) => {
@@ -72,13 +56,18 @@ onAuthStateChanged(auth, (user) => {
       }
     );
   } else {
-    setupPosts([]);
-    setupUI();
-    createAdmin();
+    getDocs(colRef)
+      .then((snapshot) => {
+        setupPosts(snapshot.docs);
+        setupUI();
+        createAdmin([]);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
   }
 });
 
-// CREATE NEW POST
 const createForm = document.querySelector("#create-form");
 createForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -94,15 +83,13 @@ createForm.addEventListener("submit", (e) => {
         .then((snapshot) => {
           getDownloadURL(snapshot.ref)
             .then((url) => {
-              // Add the post to Firestore with the image URL
               addDoc(colRef, {
                 title: createForm["title"].value,
                 content: createForm["content"].value,
-                imageURL: url, // Add the image URL to the post data
+                imageURL: url,
                 createdAt: serverTimestamp(),
               })
                 .then(() => {
-                  // Reset the form after successful upload and post creation
                   createForm.reset();
                 })
                 .catch((error) => {
@@ -120,7 +107,6 @@ createForm.addEventListener("submit", (e) => {
       alert("File size must be between 20 KB and 25 KB.");
     }
   } else {
-    // Add the post to Firestore without an image URL
     addDoc(colRef, {
       title: createForm["title"].value,
       content: createForm["content"].value,
@@ -128,7 +114,6 @@ createForm.addEventListener("submit", (e) => {
       createdAt: serverTimestamp(),
     })
       .then(() => {
-        // Reset the form after successful post creation
         createForm.reset();
       })
       .catch((err) => {
@@ -137,25 +122,20 @@ createForm.addEventListener("submit", (e) => {
   }
 });
 
-//SIGNUP
 const signupForm = document.querySelector("#signup-form");
 signupForm.addEventListener("submit", (e) => {
   e.preventDefault();
-
-  //get user info
   const email = signupForm["signup-email"].value;
   const password = signupForm["signup-password"].value;
+  const bio = signupForm["signup-bio"].value;
 
-  //signup the user
   createUserWithEmailAndPassword(auth, email, password)
     .then((cred) => {
-      const setDocRef = doc(colUserRef, cred.user.uid);
-      setDoc(setDocRef, {
-        bio: signupForm["signup-bio"].value,
+      return setDoc(doc(colUserRef, cred.user.uid), {
+        bio: bio,
       });
     })
     .then(() => {
-      //close the signup modal and reset the form
       const modal = document.querySelector("#modal-signup");
       M.Modal.getInstance(modal).close();
       signupForm.reset();
@@ -165,26 +145,22 @@ signupForm.addEventListener("submit", (e) => {
     });
 });
 
-//LOGOUT
 const logout = document.querySelector("#logout");
 logout.addEventListener("click", (e) => {
   e.preventDefault();
-  signOut(auth);
+  signOut(auth).catch((err) => {
+    console.error("Error signing out: ", err.message);
+  });
 });
 
-//LOGIN
 const loginForm = document.querySelector("#login-form");
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
-
-  //get the user infor
   const email = loginForm["login-email"].value;
   const password = loginForm["login-password"].value;
 
-  //login the user
   signInWithEmailAndPassword(auth, email, password)
     .then((cred) => {
-      //close the login modal and reset the form
       const modal = document.querySelector("#modal-login");
       M.Modal.getInstance(modal).close();
       loginForm.reset();

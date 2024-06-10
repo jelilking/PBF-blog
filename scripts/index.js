@@ -2,107 +2,90 @@ import {
   doc,
   getDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 import { colUserRef } from "./auth.js";
 
 const postList = document.querySelector(".post-grid");
 const loggedOutLinks = document.querySelectorAll(".logged-out");
 const loggedInLinks = document.querySelectorAll(".logged-in");
-const accoutDetails = document.querySelector(".account-details");
+const accountDetails = document.querySelector(".account-details");
 
 const adminForm = document.querySelector(".admin-actions");
 adminForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const adminEmail = document.querySelector("#admin-email").value;
+  // Your code to make the user an admin goes here
 });
 
-//ADD ADMIN FUNCTIONS
 export const createAdmin = (user) => {
   const admin = document.querySelectorAll(".admin");
-  console.log(admin);
   if (
     user.email === "ozigi@gmail.com" ||
     user.email === "malikraid8@gmail.com"
   ) {
-    admin.forEach((item) => {
-      item.style.display = "block";
-    });
+    admin.forEach((item) => (item.style.display = "block"));
   } else {
-    admin.forEach((item) => {
-      item.style.display = "none";
-    });
+    admin.forEach((item) => (item.style.display = "none"));
   }
 };
 
 export const setupUI = (user) => {
-  if (user) {
-    //account info
-    const getdoc = doc(colUserRef, user.uid);
+  const getdoc = user ? doc(colUserRef, user.uid) : null; // Check if user exists
+  if (getdoc) {
     getDoc(getdoc).then((doc) => {
       const html = `
-    <div>Logged in as ${user.email}</div>
-    <div>${doc.data().bio}</div>
-    `;
-
-      accoutDetails.innerHTML = html;
-    });
-
-    // Toggle UI elements
-    loggedInLinks.forEach((item) => {
-      item.style.display = "block";
-    });
-    loggedOutLinks.forEach((item) => {
-      item.style.display = "none";
+        <div>Logged in as ${user.email}</div>
+        <div>${doc.data().bio}</div>
+      `;
+      accountDetails.innerHTML = html;
     });
   } else {
-    //hide account info
-    accoutDetails.innerHTML = "";
-
-    // Toggle UI elements
-    loggedInLinks.forEach((item) => {
-      item.style.display = "none";
-    });
-    loggedOutLinks.forEach((item) => {
-      item.style.display = "block";
-    });
+    accountDetails.innerHTML = "";
   }
+
+  loggedInLinks.forEach(
+    (item) => (item.style.display = user ? "block" : "none")
+  ); // Show logged-in links if user exists
+  loggedOutLinks.forEach(
+    (item) => (item.style.display = user ? "none" : "block")
+  ); // Show logged-out links if user does not exist
 };
 
-// SETTING UP THE POSTS
+let viewCount = 0; // Track the number of viewed posts
+const viewLimit = 7; // Set the limit for free views
+
 export const setupPosts = (data) => {
   if (data.length) {
     let html = "";
 
-    data.forEach((doc) => {
+    data.forEach((doc, index) => {
       const post = doc.data();
-      console.log(post);
-
       const isLongContent = post.content.length > 20;
       const displayContent = isLongContent
         ? post.content.substring(0, 50) + "..."
         : post.content;
 
-      const div = ` 
-          <div class="post-card card">
-                <div class="card-content">
-                    <span class="card-title" style="font-weight: 700;">
-                    ${post.title}
-                    </span>
+      const div = `
+                <div class="post-card card">
+                    <div class="card-content">
+                        <span class="card-title" style="font-weight: 700;">
+                            ${post.title}
+                        </span>
+                    </div>
+                    <div class="card-image">
+                        <img src="${post.imageURL}" alt="Post Image">
+                    </div>
+                    <div class="card-content">
+                        <p class="post-content">${displayContent}</p>
+                        ${
+                          isLongContent
+                            ? '<button class="show-more">Show More</button>'
+                            : ""
+                        }
+                        <p class="full-content hidden">${post.content}</p>
+                    </div>
                 </div>
-                <div class="card-image">
-                    <img src="${post.imageURL}" alt="Post Image">
-                </div>
-                <div class="card-content">
-                    <p class="post-content">${displayContent}</p>
-                    ${
-                      isLongContent
-                        ? '<button class="show-more">Show More</button>'
-                        : ""
-                    }
-                    <p class="full-content hidden">${post.content}</p>
-                </div>
-            </div>
             `;
+
       html += div;
     });
 
@@ -125,20 +108,30 @@ export const setupPosts = (data) => {
         }
       });
     });
+
+    // Add event listener to each post card
+    const postCards = document.querySelectorAll(".post-card");
+    postCards.forEach((card) => {
+      card.addEventListener("click", () => {
+        viewCount++;
+        if (viewCount >= viewLimit) {
+          const modal = document.querySelector("#modal-login-notification");
+          M.Modal.getInstance(modal).open();
+          viewCount = 0; // Reset the view count after showing the notification
+        }
+      });
+    });
   } else {
-    postList.innerHTML = ` 
-          <div class="post-card card">
+    postList.innerHTML = `
+            <div class="post-card card">
                 <div class="card-content center">
-                    <span class="card-title" style="font-weight: 700;">
-                    Login to view posts
-                    </span>
+                    <span class="card-title" style="font-weight: 700;">No posts available</span>
                 </div>
             </div>
-            `;
+        `;
   }
 };
 
-// Set Up Materialize Components
 document.addEventListener("DOMContentLoaded", function () {
   var modals = document.querySelectorAll(".modal");
   M.Modal.init(modals);
@@ -148,4 +141,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var sidenav = document.querySelectorAll(".sidenav");
   M.Sidenav.init(sidenav);
+
+  document.getElementById("notify-login-btn").addEventListener("click", () => {
+    const modalLogin = document.querySelector("#modal-login");
+    M.Modal.getInstance(modalLogin).open();
+  });
 });
