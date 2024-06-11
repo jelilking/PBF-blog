@@ -142,8 +142,15 @@ document.addEventListener("DOMContentLoaded", function () {
   var sidenav = document.querySelectorAll(".sidenav");
   M.Sidenav.init(sidenav);
 
-  document.getElementById("notify-login-btn").addEventListener("click", () => {
+  const notifyLoginBtn = document.querySelector("#notify-login-btn");
+  notifyLoginBtn.addEventListener("click", () => {
     const modalLogin = document.querySelector("#modal-login");
     M.Modal.getInstance(modalLogin).open();
+  });
+
+  const notifySignupBtn = document.querySelector("#notify-signup-btn");
+  notifySignupBtn.addEventListener("click", () => {
+    const modalSignup = document.querySelector("#modal-signup");
+    M.Modal.getInstance(modalSignup).open();
   });
 });
